@@ -1,10 +1,11 @@
-let express = require('express');
-let bodyParser = require('body-parser');
-let mongoose = require('mongoose');
-let methodOverride = require('method-override');// allows us to use ?_method overriding
-let expressSanitizer = require('express-sanitizer');
+const 	express 				= require('express'),
+		bodyParser 				= require('body-parser'),
+		mongoose 				= require('mongoose'),
+		methodOverride 			= require('method-override'),// allows us to use ?_method overriding
+		expressSanitizer 		= require('express-sanitizer'),
+		Post 					= require('./models/post');
 
-let app = express();
+const 	app = express();
 
 //set up DB and express
 mongoose.connect('mongodb://localhost:27017/blog_app', { useNewUrlParser: true });
@@ -15,15 +16,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(expressSanitizer());
 app.use(express.static('public'));
 app.use(methodOverride('_method'));//connect lib to our app and declare the name of the method overriding
-
-// mongoose/model config
-const postSchema = new mongoose.Schema({
-	title: String,
-	image: String,
-	body: String,
-	created: { type: Date, default: Date.now }
-});
-const Post = mongoose.model('Blog', postSchema);
 
 // Post.create({
 //     title: 'Engineering problems',
