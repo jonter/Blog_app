@@ -3,9 +3,12 @@ const 	express 				= require('express'),
 		mongoose 				= require('mongoose'),
 		methodOverride 			= require('method-override'),// allows us to use ?_method overriding
 		expressSanitizer 		= require('express-sanitizer'),
-		Post 					= require('./models/post');
+		Post 					= require('./models/post'),
+		seedDB					= require('./seeds');
 
 const 	app = express();
+
+seedDB();
 
 //set up DB and express
 mongoose.connect('mongodb://localhost:27017/blog_app', { useNewUrlParser: true });
@@ -16,17 +19,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(expressSanitizer());
 app.use(express.static('public'));
 app.use(methodOverride('_method'));//connect lib to our app and declare the name of the method overriding
-
-// Post.create({
-//     title: 'Engineering problems',
-//     image: 'https://images.unsplash.com/photo-1485965373059-f07657e9f841?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80',
-//     body: 'A growing appreciation of individual preferences and aptitudes has led toward more “personalized learning,” in which instruction is tailored to a student’s individual needs. Given the diversity of individual preferences, and the complexity of each human brain, developing teaching methods that optimize learning will require engineering solutions of the future.'
-// });
-// Post.create({
-//     title: 'Engineering solustions',
-//     image: 'https://images.unsplash.com/photo-1517420704952-d9f39e95b43e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80',
-//     body: 'As computers have become available for all aspects of human endeavors, there is now a consensus that a systematic approach to health informatics - the acquisition, management, and use of information in health - can greatly enhance the quality and efficiency of medical care and the response to widespread public health emergencies.'
-// });
 
 //RESTFUL ROUTES
 app.get('/', (req, res) => {
@@ -62,13 +54,15 @@ app.post('/posts', (req, res) => {
 });
 
 //SHOW ROUTE
+//Now we have to send comments together using populate method 
 app.get('/posts/:id', (req, res) => {
-	Post.findById(req.params.id, (err, foundPost) => {
+	Post.findById(req.params.id).populate('comments').exec((err, foundPost) => {
 		if (err) {
 			console.log(err);
 			res.redirect('/posts');
 			return;
 		}
+		console.log(foundPost);
 		res.render('show', { post: foundPost });
 	});
 });

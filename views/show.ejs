@@ -16,6 +16,19 @@
     <form id="delete" action="/posts/<%=post._id%>/?_method=DELETE" method="POST">
         <button class="ui red basic button">Delete</button>
     </form>
+
+    <div class="ui divided items">
+        <% post.comments.forEach(comment => { %>
+            <div class="item">
+                <div class="description">
+                    
+                    <strong><%= comment.author %></strong> - <%= comment.text %>
+                </div>
+                      
+            </div>
+        <% }); %>
+    </div>
+
    
 </div>
 
