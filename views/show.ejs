@@ -1,0 +1,25 @@
+<% include ./partials/header %>
+
+<div class="ui main container text segment">
+    <div class="ui huge header"><%= post.title %></div>
+    <div class="ui top attached segment">
+        <div class="item">
+            <img class="ui image centered rounded" src="<%= post.image %>" alt="image">
+            
+            <span><%= post.created.getDate() %>. <%= post.created.getMonth() %>. <%= post.created.getFullYear() %></span>
+            <span><%= post.created.getHours() %>: <%= post.created.getMinutes() %></span>
+               
+            <p><%- post.body %></p>
+        </div>
+    </div>
+    <a class="ui button orange basic" href="/posts/<%=post._id%>/edit">Edit</a>
+    <form id="delete" action="/posts/<%=post._id%>/?_method=DELETE" method="POST">
+        <button class="ui red basic button">Delete</button>
+    </form>
+   
+</div>
+
+
+
+
+<% include ./partials/footer %>

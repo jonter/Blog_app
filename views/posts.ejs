@@ -1,0 +1,51 @@
+<% include partials/header %>
+
+<div class="ui main text container">
+    <div class="ui huge header segment"> All the posts </div>
+    <div class="ui top attachment segment">
+        <div class="ui divided items">
+            <% posts.forEach(post => { %>
+                <div class="item">
+                    <div class="image">
+                        <img src="<%= post.image %>" alt="image">
+                    </div>
+
+                    <div class="content">
+                        <a class="header" href="/posts/<%= post._id %>"><%= post.title %></a>
+                        <div class="meta segment">
+                            <div><%= post.created.getDate() %>. <%= post.created.getMonth() %>. <%= post.created.getFullYear() %></div>
+                            <div><%= post.created.getHours() %>: <%= post.created.getMinutes() %></div>
+                        </div>
+                        
+                        <div class="description">
+                            <% if(post.body.length>100){%>
+                            <p><%- post.body.substring(0,100) %> ...</p>    
+                            <%} else { %>
+                            <p><%- post.body %></p>
+                            <% }  %>
+                        </div>
+
+                        <div class="extra">
+                            <a class="ui basic button violet" href="/posts/<%= post._id %>">Show More </a>
+                        </div>
+                    </div>
+
+                       
+                    
+                </div>
+            <% }); %>
+
+        </div>
+    </div>
+</div> 
+
+
+
+
+
+
+
+
+
+
+<% include partials/footer %>
