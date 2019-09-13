@@ -13,7 +13,14 @@
         <div class="ui container">
             <a href="/posts" class="item"><i class="newspaper outline icon"></i> Posts </a>
             <a href="/" class="item"><i class="book icon"></i> Blog Site</a>
-            <a class="item right" href="/posts/new">Create a new post</a>
+            <a class="item" href="/posts/new">Create a new post</a>
+            <% if(!currentUser){ %>
+                <a href="/login" class="item right">Login</a>
+                <a href="/register" class="item right">Sign up</a>
+            <% }else{ %>
+                <div class="item right">Signed as <%= currentUser.username %></div>
+                <a href="/logout" class="item right">Logout</a>
+            <% } %>
         </div>
     </div>
     

@@ -1,14 +1,18 @@
-const express = require('express'),
-	bodyParser = require('body-parser'),
-	mongoose = require('mongoose'),
-	methodOverride = require('method-override'), // allows us to use ?_method overriding
-	expressSanitizer = require('express-sanitizer'),
-	Post = require('./models/post'),
-	Comment = require('./models/comment'),
-	seedDB = require('./seeds');
+const express 				= require('express'),
+	bodyParser 				= require('body-parser'),
+	mongoose 				= require('mongoose'),
+	passport 				= require('passport'),
+	LocalStrategy			= require('passport-local'),
+	methodOverride 			= require('method-override'), // allows us to use ?_method overriding
+	expressSanitizer 		= require('express-sanitizer'),
+	Post 					= require('./models/post'),
+	Comment 				= require('./models/comment'),
+	User					= require('./models/user'),
+	seedDB 					= require('./seeds');
 
 const app = express();
 
+//seems that this one should go after mongoose connect
 seedDB();
 
 //set up DB and express
@@ -18,8 +22,29 @@ mongoose.set('useFindAndModify', false); //to remove deprecation warning
 app.set('view engine', 'ejs');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(expressSanitizer());
-app.use(express.static(__dirname+'public'));
+app.use(express.static(__dirname+'/public'));
 app.use(methodOverride('_method')); //connect lib to our app and declare the name of the method overriding
+
+//PASSPORT CONFIGS
+app.use(require('express-session')({
+	secret: 'I will change that secret later',
+	resave:false,
+	saveUninitialized: false
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+passport.use(new LocalStrategy(User.authenticate()));
+
+//add an anonymus middleware before each route which add a new var (currentUser) to ejs files
+app.use((req, res, next)=>{
+	// req.user refers to authenticated user (or undifined when isn`t logged in)
+	res.locals.currentUser = req.user;
+	next();
+});
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 //RESTFUL ROUTES
 app.get('/', (req, res) => {
@@ -63,7 +88,6 @@ app.get('/posts/:id', (req, res) => {
 			res.redirect('/posts');
 			return;
 		}
-		console.log(foundPost);
 		res.render('posts/show', { post: foundPost });
 	});
 });
@@ -107,7 +131,7 @@ app.delete('/posts/:id', (req, res) => {
 
 //COMMENT ROUTES
 
-app.get('/posts/:id_post/comments/new', (req, res) => {
+app.get('/posts/:id_post/comments/new',isLoggedIn, (req, res) => {
 	Post.findById(req.params.id_post, (err, foundPost) => {
 		if (err) {
 			res.redirect('/posts' + req.params.id_post);
@@ -117,7 +141,7 @@ app.get('/posts/:id_post/comments/new', (req, res) => {
 	});
 });
 
-app.post('/posts/:id_post/comments', (req,res)=>{
+app.post('/posts/:id_post/comments',isLoggedIn, (req,res)=>{
 	//find post, create comment, add comment to the post, save updated post
 	Post.findById(req.params.id_post, (err, foundPost)=>{
 		if (err) {
@@ -128,16 +152,62 @@ app.post('/posts/:id_post/comments', (req,res)=>{
 		Comment.create(req.body.comment, (err, newComment)=>{
 			if (err) {
 				console.log(err);
-				res.redirect('/posts' + req.params.id_post);
+				res.redirect('/posts/' + req.params.id_post);
 				return;
 			}
 			foundPost.comments.push(newComment);
 			foundPost.save();
-			res.redirect('/posts' + req.params.id_post);
+			res.redirect('/posts/' + req.params.id_post);
 		});
 
 	});
 });
+
+//AUTH ROUTES
+//==================
+app.get('/register', (req,res)=>{
+	res.render('register');
+});
+
+app.post('/register', (req,res)=>{
+	const newUser = new User({username: req.body.username})
+	User.register(newUser, req.body.password, (err,user)=>{
+		if(err){
+			console.log(err);
+			//there could be res.render() instead redirect
+			return res.redirect('/register');
+		}
+		passport.authenticate('local')(req, res, function(){
+			res.redirect('/posts');
+		});
+
+	});
+});
+
+//LOGIN routes
+app.get('/login', (req, res)=>{
+	res.render('login');
+});
+
+app.post('/login', passport.authenticate('local',{
+	successRedirect:'/posts',
+	failureRedirect:'/login' 
+}) ,(req, res)=>{
+});
+
+//LOGOUT route
+app.get('/logout',(req, res)=>{
+	req.logout();
+	res.redirect('/posts');
+});
+
+
+function isLoggedIn(req, res, next){
+	if(req.isAuthenticated()){
+		return next();
+	}
+	res.redirect('/login');
+}
 
 
 const PORT = process.env.PORT || 3000;

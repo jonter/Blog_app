@@ -6,6 +6,5 @@ i.icon{
     margin-top: 90px;
 }
 form#delete{
-    display: inline;
     float: right;
-}
+} 
