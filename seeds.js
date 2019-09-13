@@ -24,38 +24,39 @@ data = [
 function seedDB(){
     //remove all the posts
     Post.deleteMany({},(err)=>{
-        if(err) {
-            console.log(err);
-            return;
-        }
-        console.log('removed all the posts!');
-        //add a few posts
-        data.forEach((onePost)=>{
-            Post.create(onePost, (err, newPost)=>{
-                if(err){
-                    console.log(err);
-                    return;
-                }
+        //obsolete Comment model has changed
+        // if(err) {
+        //     console.log(err);
+        //     return;
+        // }
+        // console.log('removed all the posts!');
+        // //add a few posts
+        // data.forEach((onePost)=>{
+        //     Post.create(onePost, (err, newPost)=>{
+        //         if(err){
+        //             console.log(err);
+        //             return;
+        //         }
 
-                console.log('added a campground');
-                //add a few comments to them
+        //         console.log('added a campground');
+        //         //add a few comments to them
 
-                Comment.create({
-                    text:'I extremly love shrek!!!!',
-                    author: 'ShIL'
-                }, (err, newComment)=>{
-                    if(err){
-                        console.log(err);
-                        return;
-                    }
-                    newPost.comments.push(newComment);
-                    newPost.save();
-                    console.log('created new comment')
-                });
+        //         Comment.create({
+        //             text:'I extremly love shrek!!!!',
+        //             author: 'ShIL'
+        //         }, (err, newComment)=>{
+        //             if(err){
+        //                 console.log(err);
+        //                 return;
+        //             }
+        //             newPost.comments.push(newComment);
+        //             newPost.save();
+        //             console.log('created new comment')
+        //         });
 
-            });
+        //     });
 
-        });
+        // });
     });
     
 }

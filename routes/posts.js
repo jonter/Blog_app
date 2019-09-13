@@ -15,19 +15,27 @@ router.get('/', (req, res) => {
 });
 
 // NEW ROUTE
-router.get('/new', (req, res) => {
+router.get('/new', isLoggedIn, (req, res) => {
 	res.render('posts/new');
 });
 
 //CREATE ROUTE
-router.post('/', (req, res) => {
+router.post('/', isLoggedIn, (req, res) => {
 	req.body.blog.body = req.sanitize(req.body.blog.body);
+	//create an author (as in postSchema)
+	const author = {
+		id: req.user._id,
+		username: req.user.username
+	};
+	// add an author to the post
+	req.body.blog.author = author;
 	Post.create(req.body.blog, (err, newPost) => {
 		if (err) {
 			res.render('posts/new');
 			console.log(err);
-			return;
+			return; 
 		}
+		console.log(newPost);
 		res.redirect('/posts');
 	});
 });

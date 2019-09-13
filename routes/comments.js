@@ -28,6 +28,12 @@ router.post('/',isLoggedIn, (req,res)=>{
 				res.redirect('/posts/' + req.params.id_post);
 				return;
 			}
+			//and username and id to the comment
+			newComment.author.id = req.user._id;
+			newComment.author.username = req.user.username;
+			//save comment
+			newComment.save();
+			//add comment to the post
 			foundPost.comments.push(newComment);
 			foundPost.save();
 			res.redirect('/posts/' + req.params.id_post);

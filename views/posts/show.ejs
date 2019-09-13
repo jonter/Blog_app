@@ -2,6 +2,7 @@
 
 <div class="ui main container text segment">
     <div class="ui huge header"><%= post.title %></div>
+    <span class="ui header green">Submitted by <em> <%= post.author.username %> </em> </span>
     <div class="ui top attached segment">
         <div class="item">
             <img class="ui image centered rounded" src="<%= post.image %>" alt="image">
@@ -21,7 +22,7 @@
         <% post.comments.forEach(comment => { %>
             <div class="item">
                 <div class="description">
-                    <strong><%= comment.author %></strong> - <%= comment.text %>
+                    <strong><%= comment.author.username %></strong> - <%= comment.text %>
                 </div>    
             </div>
         <% }); %>

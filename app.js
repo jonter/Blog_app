@@ -14,7 +14,7 @@ const indexRoutes = require('./routes/index'),
 	  postsRoutes = require('./routes/posts');
 
 //seems that this one should go after mongoose connect
-seedDB();
+//seedDB();
 
 //set up DB and express
 mongoose.connect('mongodb://localhost:27017/blog_app', { useNewUrlParser: true });
