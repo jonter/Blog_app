@@ -13,17 +13,28 @@
             <p><%- post.body %></p>
         </div>
     </div>
-    <a class="ui button orange basic" href="/posts/<%=post._id%>/edit">Edit</a>
-    <form id="delete" action="/posts/<%=post._id%>/?_method=DELETE" method="POST">
-        <button class="ui red basic button">Delete</button>
-    </form>
-
+    <!-- here we also check user ownership to show or hide the buttons.
+        We can use currentUser because of the middleware in app.js (line 41) -->
+    <%if(currentUser && post.author.id.equals(currentUser._id)){ %>
+        <a class="ui button orange basic" href="/posts/<%=post._id%>/edit">Edit</a>
+        <form id="delete" action="/posts/<%=post._id%>/?_method=DELETE" method="POST">
+            <button class="ui red basic button">Delete</button>
+        </form>
+    <% } %>    
     <div class="ui divided items">
         <% post.comments.forEach(comment => { %>
             <div class="item">
                 <div class="description">
                     <strong><%= comment.author.username %></strong> - <%= comment.text %>
                 </div>    
+
+                <% if(currentUser && comment.author.id.equals(currentUser._id)){ %>
+                    <a class="ui button orange mini inverted" 
+                    href="/posts/<%=post._id%>/comments/<%=comment._id%>/edit">Edit</a>
+                    <form id="delete" action="/posts/<%=post._id%>/comments/<%=comment._id%>/?_method=DELETE" method="POST">
+                        <button class="ui button red mini inverted ">Delete</button>
+                    </form>
+                <% } %>
             </div>
         <% }); %>
         <div class="item">
