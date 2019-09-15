@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Post = require('../models/post');
+//index.js is a special name so when you require a folder it automatically points to that file
+const middleware = require('../middleware');
 
 
 // I get rid of '/posts' cause app.use('/posts',...)
@@ -15,12 +17,12 @@ router.get('/', (req, res) => {
 });
 
 // NEW ROUTE
-router.get('/new', isLoggedIn, (req, res) => {
+router.get('/new', middleware.isLoggedIn, (req, res) => {
 	res.render('posts/new');
 });
 
 //CREATE ROUTE
-router.post('/', isLoggedIn, (req, res) => {
+router.post('/', middleware.isLoggedIn, (req, res) => {
 	req.body.blog.body = req.sanitize(req.body.blog.body);
 	//create an author (as in postSchema)
 	const author = {
@@ -53,14 +55,14 @@ router.get('/:id', (req, res) => {
 	});
 });
 //EDIT ROUTE
-router.get('/:id/edit',checkPostOwnership, (req, res) => {
+router.get('/:id/edit', middleware.checkPostOwnership, (req, res) => {
 	Post.findById(req.params.id, (err, foundPost) => {
 		res.render('posts/edit', { post: foundPost });
 	});
 });
 
 //UPDATE ROUTE
-router.put('/:id',checkPostOwnership, (req, res) => {
+router.put('/:id', middleware.checkPostOwnership, (req, res) => {
 	req.body.blog.body = req.sanitize(req.body.blog.body);
 	Post.findByIdAndUpdate(req.params.id, req.body.blog, (err, updatedPost) => {
 		if (err) {
@@ -72,7 +74,7 @@ router.put('/:id',checkPostOwnership, (req, res) => {
 });
 
 //DELETE ROUTE
-router.delete('/:id',checkPostOwnership, (req, res) => {
+router.delete('/:id', middleware.checkPostOwnership, (req, res) => {
 	Post.findByIdAndRemove(req.params.id, (err) => {
 		if (err) {
 			return res.redirect('/posts' + req.params.id);
@@ -80,32 +82,5 @@ router.delete('/:id',checkPostOwnership, (req, res) => {
 		res.redirect('/posts');
 	});
 });
-
-//another middleware for user permission identification (can the user manage the post)
-function checkPostOwnership(req, res, next){
-	if(!req.isAuthenticated()){
-		return res.redirect('/login');
-	}
-	Post.findById(req.params.id, (err, foundPost) => {
-		if (err) {
-			console.log(err);
-			return res.redirect('back');
-		}
-
-		if(foundPost.author.id.equals(req.user._id)){
-			next();
-		}else{
-			res.redirect('back');
-		}		
-	});
-}
-
-function isLoggedIn(req, res, next){
-	if(req.isAuthenticated()){
-		return next();
-	}
-	res.redirect('/login');
-}
-
 
 module.exports = router;

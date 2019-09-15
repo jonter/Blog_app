@@ -2,9 +2,11 @@ const express = require('express');
 const router = express.Router({mergeParams:true});//this option need to let our router recieve and use ':id_post' normally
 const Post = require('../models/post');
 const Comment = require('../models/comment');
+//index.js is a special name so when you require a folder it automatically points to that file
+const middleware = require('../middleware');
 
 //COMMENT ROUTES
-router.get('/new',isLoggedIn, (req, res) => {
+router.get('/new', middleware.isLoggedIn, (req, res) => {
 	Post.findById(req.params.id_post, (err, foundPost) => {
 		if (err) {
 			res.redirect('/posts' + req.params.id_post);
@@ -14,7 +16,7 @@ router.get('/new',isLoggedIn, (req, res) => {
 	});
 });
 
-router.post('/',isLoggedIn, (req,res)=>{
+router.post('/', middleware.isLoggedIn, (req,res)=>{
 	//find post, create comment, add comment to the post, save updated post
 	Post.findById(req.params.id_post, (err, foundPost)=>{
 		if (err) {
@@ -43,7 +45,7 @@ router.post('/',isLoggedIn, (req,res)=>{
 });
 
 //EDIT ROUTE
-router.get('/:id_comment/edit', checkCommentOwnership, (req, res)=>{
+router.get('/:id_comment/edit', middleware.checkCommentOwnership, (req, res)=>{
 	Post.findById(req.params.id_post, (err,foundPost)=>{
 		if(err){
 			return res.redirect('back');
@@ -59,7 +61,7 @@ router.get('/:id_comment/edit', checkCommentOwnership, (req, res)=>{
 });
 
 //UPDATE ROUTE
-router.put('/:id_comment', checkCommentOwnership, (req,res)=>{
+router.put('/:id_comment', middleware.checkCommentOwnership, (req,res)=>{
 	Comment.findByIdAndUpdate(req.params.id_comment, req.body.comment , (err, updatedComment)=>{
 		if(err){
 		    return	res.redirect('back');
@@ -69,7 +71,7 @@ router.put('/:id_comment', checkCommentOwnership, (req,res)=>{
 });
 
 //DESTROY ROUTE
-router.delete('/:id_comment',checkCommentOwnership,(req,res)=>{
+router.delete('/:id_comment', middleware.checkCommentOwnership,(req,res)=>{
 	Comment.findByIdAndRemove(req.params.id_comment, (err)=>{
 		if(err){
 			console.log(err);
@@ -79,32 +81,5 @@ router.delete('/:id_comment',checkCommentOwnership,(req,res)=>{
 		res.redirect('/posts/'+req.params. id_post);
 	});
 });
-
-//another middleware for user permission identification (can the user manage the comment)
-function checkCommentOwnership(req, res, next){
-	if(!req.isAuthenticated()){
-		return res.redirect('/login');
-	}
-	Comment.findById(req.params.id_comment, (err, foundComment) => {
-		if (err) {
-			console.log(err);
-			return res.redirect('back');
-		}
-
-		if(foundComment.author.id.equals(req.user._id)){
-			next();
-		}else{
-			res.redirect('back');
-		}		
-	});
-}
-
-function isLoggedIn(req, res, next){
-	if(req.isAuthenticated()){
-		return next();
-	}
-	res.redirect('/login');
-}
-
 
 module.exports= router;
