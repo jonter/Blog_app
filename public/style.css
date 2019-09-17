@@ -8,3 +8,14 @@ i.icon{
 form#delete{
     float: right;
 } 
+
+.error-message.container{
+    margin-top: 90px;
+    border-color: brown;
+    background-color: rgba(165, 42, 42, 0.363)
+}
+.success-message.container{
+    margin-top: 90px;
+    border-color: greenyellow;
+    background-color: rgba(172, 255, 47, 0.527);
+}

@@ -33,11 +33,11 @@ router.post('/', middleware.isLoggedIn, (req, res) => {
 	req.body.blog.author = author;
 	Post.create(req.body.blog, (err, newPost) => {
 		if (err) {
-			res.render('posts/new');
 			console.log(err);
-			return; 
+			req.flash('error', err.message);
+			return res.render('posts/new');
 		}
-		console.log(newPost);
+		req.flash('success', 'You have created the post');
 		res.redirect('/posts');
 	});
 });
@@ -48,8 +48,8 @@ router.get('/:id', (req, res) => {
 	Post.findById(req.params.id).populate('comments').exec((err, foundPost) => {
 		if (err) {
 			console.log(err);
-			res.redirect('/posts');
-			return;
+			req.flash('error', 'Cannot find the post');
+			return res.redirect('/posts');
 		}
 		res.render('posts/show', { post: foundPost });
 	});
@@ -57,6 +57,11 @@ router.get('/:id', (req, res) => {
 //EDIT ROUTE
 router.get('/:id/edit', middleware.checkPostOwnership, (req, res) => {
 	Post.findById(req.params.id, (err, foundPost) => {
+		if (err) {
+			console.log(err);
+			req.flash('error', err.message);
+			return res.redirect('/posts');
+		}
 		res.render('posts/edit', { post: foundPost });
 	});
 });
@@ -69,6 +74,7 @@ router.put('/:id', middleware.checkPostOwnership, (req, res) => {
 			console.log(err);
 			return res.redirect('/posts');
 		}
+		req.flash('success', 'Post is changed');
 		res.redirect('/posts/' + req.params.id);
 	});
 });
@@ -79,6 +85,7 @@ router.delete('/:id', middleware.checkPostOwnership, (req, res) => {
 		if (err) {
 			return res.redirect('/posts' + req.params.id);
 		}
+		req.flash('success', 'Post deleted');
 		res.redirect('/posts');
 	});
 });

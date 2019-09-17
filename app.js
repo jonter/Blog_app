@@ -1,6 +1,7 @@
 const express 				= require('express'),
 	bodyParser 				= require('body-parser'),
 	mongoose 				= require('mongoose'),
+	flash 				= require('connect-flash'),
 	passport 				= require('passport'),
 	LocalStrategy			= require('passport-local'),
 	methodOverride 			= require('method-override'), // allows us to use ?_method overriding
@@ -26,6 +27,8 @@ app.use(expressSanitizer());
 app.use(express.static(__dirname+'/public'));
 app.use(methodOverride('_method')); //connect lib to our app and declare the name of the method overriding
 
+app.use(flash());
+
 //PASSPORT CONFIGS
 app.use(require('express-session')({
 	secret: 'I will change that secret later',
@@ -41,6 +44,9 @@ passport.use(new LocalStrategy(User.authenticate()));
 app.use((req, res, next)=>{
 	// req.user refers to authenticated user (or undifined when isn`t logged in)
 	res.locals.currentUser = req.user;
+	//now the variable will be availiable for every route
+	res.locals.error = req.flash('error');
+	res.locals.success = req.flash('success');
 	next();
 });
 passport.serializeUser(User.serializeUser());

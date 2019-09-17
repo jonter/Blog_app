@@ -38,6 +38,7 @@ router.post('/', middleware.isLoggedIn, (req,res)=>{
 			//add comment to the post
 			foundPost.comments.push(newComment);
 			foundPost.save();
+			req.flash('success', 'Comment is created');
 			res.redirect('/posts/' + req.params.id_post);
 		});
 
@@ -66,6 +67,7 @@ router.put('/:id_comment', middleware.checkCommentOwnership, (req,res)=>{
 		if(err){
 		    return	res.redirect('back');
 		}
+		req.flash('success', 'Comment is changed');
 		res.redirect('/posts/'+req.params.id_post);
 	});
 });
@@ -75,8 +77,10 @@ router.delete('/:id_comment', middleware.checkCommentOwnership,(req,res)=>{
 	Comment.findByIdAndRemove(req.params.id_comment, (err)=>{
 		if(err){
 			console.log(err);
+			req.flash('error', err.message);
 			return res.redirect('back');
 		}
+		req.flash('success', 'Comment deleted');
 		//send a message that we have succesfully removed a comment
 		res.redirect('/posts/'+req.params. id_post);
 	});
