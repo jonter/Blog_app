@@ -46,7 +46,7 @@ router.post('/', middleware.isLoggedIn, (req, res) => {
 //Now we have to send comments together using populate method
 router.get('/:id', (req, res) => {
 	Post.findById(req.params.id).populate('comments').exec((err, foundPost) => {
-		if (err) {
+		if (err || !foundPost) {
 			console.log(err);
 			req.flash('error', 'Cannot find the post');
 			return res.redirect('/posts');

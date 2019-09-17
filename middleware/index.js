@@ -18,9 +18,11 @@ middlewareObject.checkCommentOwnership = function(req, res, next){
 		return res.redirect('/login');
 	}
 	Comment.findById(req.params.id_comment, (err, foundComment) => {
-		if (err) {
+		//sometimes findById doesn`t send error, but send null instead of foundComment/foundPost
+		//so we get rid of the issue 
+		if (err || !foundComment) {
 			console.log(err);
-			req.flash('error', 'Cannot find that comment');
+			req.flash('error', 'Cannot find the comment');
 			return res.redirect('back');
 		}
 
@@ -40,9 +42,10 @@ middlewareObject.checkPostOwnership = function(req, res, next){
 		return res.redirect('/login');
 	}
 	Post.findById(req.params.id, (err, foundPost) => {
-		if (err) {
+		//see line 21 for explanation
+		if (err || !foundPost) {
 			console.log(err);
-			req.flash('error', 'Cannot find that comment');
+			req.flash('error', 'Cannot find the post');
 			return res.redirect('back');
 		}
 

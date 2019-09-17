@@ -8,9 +8,9 @@ const middleware = require('../middleware');
 //COMMENT ROUTES
 router.get('/new', middleware.isLoggedIn, (req, res) => {
 	Post.findById(req.params.id_post, (err, foundPost) => {
-		if (err) {
-			res.redirect('/posts' + req.params.id_post);
-			return;
+		if (err || !foundPost) {
+			req.flash('error' , 'Cannot find the post!');
+			return res.redirect('/posts/' + req.params.id_post);
 		}
 		res.render('comments/new', { post: foundPost });
 	});
@@ -19,13 +19,13 @@ router.get('/new', middleware.isLoggedIn, (req, res) => {
 router.post('/', middleware.isLoggedIn, (req,res)=>{
 	//find post, create comment, add comment to the post, save updated post
 	Post.findById(req.params.id_post, (err, foundPost)=>{
-		if (err) {
+		if (err || !foundPost) {
 			console.log(err);
 			res.redirect('/posts' + req.params.id_post);
 			return;
 		}
 		Comment.create(req.body.comment, (err, newComment)=>{
-			if (err) {
+			if (err || !newComment) {
 				console.log(err);
 				res.redirect('/posts/' + req.params.id_post);
 				return;
@@ -48,12 +48,13 @@ router.post('/', middleware.isLoggedIn, (req,res)=>{
 //EDIT ROUTE
 router.get('/:id_comment/edit', middleware.checkCommentOwnership, (req, res)=>{
 	Post.findById(req.params.id_post, (err,foundPost)=>{
-		if(err){
+		if(err || !foundPost){
+			req.flash('error', 'Cannot find the post');
 			return res.redirect('back');
 		}
-
 		Comment.findById(req.params.id_comment, (err, foundComment)=>{
-			if(err){
+			if(err || !foundComment){
+				req.flash('error', 'Cannot find the comment');
 				return res.redirect('back');
 			}
 			res.render('comments/edit',{post: foundPost, comment: foundComment	});
@@ -64,7 +65,8 @@ router.get('/:id_comment/edit', middleware.checkCommentOwnership, (req, res)=>{
 //UPDATE ROUTE
 router.put('/:id_comment', middleware.checkCommentOwnership, (req,res)=>{
 	Comment.findByIdAndUpdate(req.params.id_comment, req.body.comment , (err, updatedComment)=>{
-		if(err){
+		if(err || !updatedComment){
+			req.flash('error','Cannot update the comment');
 		    return	res.redirect('back');
 		}
 		req.flash('success', 'Comment is changed');
