@@ -4,7 +4,8 @@
   "description": "the test app to srongify my skills in backend (and a bit of frontend)",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
   },
   "author": "Evgeniy",
   "license": "ISC",
