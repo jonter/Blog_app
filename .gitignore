@@ -90,3 +90,5 @@ typings/
 .gitattributes
         
 package-lock.json
+
+.env

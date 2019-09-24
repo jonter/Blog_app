@@ -14,12 +14,12 @@ const indexRoutes = require('./routes/index'),
 	  commentRoutes = require('./routes/comments'),
 	  postsRoutes = require('./routes/posts');
 
-//seems that this one should go after mongoose connect
-//seedDB();
+//let us use env variables defined in .env file (dotenv package)
+require('dotenv').config();
 
 //set up DB and express
-// mongoose.connect('mongodb://localhost:27017/blog_app', { useNewUrlParser: true });
-mongoose.connect('mongodb+srv://user-master:password1234@blogtest-aeky9.mongodb.net/test?retryWrites=true&w=majority', { useNewUrlParser: true });
+const url = process.env.DATABASE_URL || 'mongodb://localhost:27017/blog_app';
+mongoose.connect(url, { useNewUrlParser: true });
 mongoose.set('useFindAndModify', false); //to remove deprecation warning
 
 app.set('view engine', 'ejs');
