@@ -18,7 +18,8 @@ const indexRoutes = require('./routes/index'),
 //seedDB();
 
 //set up DB and express
-mongoose.connect('mongodb://localhost:27017/blog_app', { useNewUrlParser: true });
+// mongoose.connect('mongodb://localhost:27017/blog_app', { useNewUrlParser: true });
+mongoose.connect('mongodb+srv://user-master:password1234@blogtest-aeky9.mongodb.net/test?retryWrites=true&w=majority', { useNewUrlParser: true });
 mongoose.set('useFindAndModify', false); //to remove deprecation warning
 
 app.set('view engine', 'ejs');
