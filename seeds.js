@@ -21,44 +21,79 @@ data = [
 ]
 
 
-function seedDB(){
-    //remove all the posts
-    Post.deleteMany({},(err)=>{
-        //obsolete Comment model has changed
-        // if(err) {
-        //     console.log(err);
-        //     return;
-        // }
-        // console.log('removed all the posts!');
-        // //add a few posts
-        // data.forEach((onePost)=>{
-        //     Post.create(onePost, (err, newPost)=>{
-        //         if(err){
-        //             console.log(err);
-        //             return;
-        //         }
+async function seedDB(){
+    try{
+        //try here Promise.all([]);
+        await Comment.deleteMany({});
+        console.log('removed all comments');
+        await Post.deleteMany({});
+        console.log('removed all posts');
 
-        //         console.log('added a campground');
-        //         //add a few comments to them
-
-        //         Comment.create({
-        //             text:'I extremly love shrek!!!!',
-        //             author: 'ShIL'
-        //         }, (err, newComment)=>{
-        //             if(err){
-        //                 console.log(err);
-        //                 return;
-        //             }
-        //             newPost.comments.push(newComment);
-        //             newPost.save();
-        //             console.log('created new comment')
-        //         });
-
-        //     });
-
-        // });
-    });
-    
+        for(const onePost of data){
+            let newPost = await Post.create(onePost);
+            console.log('post created');
+            let newComment = await Comment.create({
+                text:'I extremly love shrek!!!!',
+                author: {username: 'ShIL'}
+            });
+            console.log('comment created');
+            
+            newPost.comments.push(newComment);
+            newPost.save();
+        }
+    }
+    catch(error){
+        console.log(error);
+    }
 }
+
+
+// function seedDB(){
+
+//     //delete all the comments
+//     Comment.deleteMany({},(err)=>{
+//         if(err) {
+//             console.log(err);
+//             return;
+//         }
+//         //remove all the posts
+//         Post.deleteMany({},(err)=>{
+//             //obsolete Comment model has changed
+//             if(err) {
+//                 console.log(err);
+//                 return;
+//             }
+//             console.log('removed all the posts!');
+//             //add a few posts
+//             data.forEach((onePost)=>{
+//                 Post.create(onePost, (err, newPost)=>{
+//                     if(err){
+//                         console.log(err);
+//                         return;
+//                     }
+    
+//                     console.log('added a campground');
+//                     //add a few comments to them
+    
+//                     Comment.create({
+//                         text:'I extremly love shrek!!!!',
+//                         author: {username: 'ShIL'}
+//                     }, (err, newComment)=>{
+//                         if(err){
+//                             console.log(err);
+//                             return;
+//                         }
+//                         newPost.comments.push(newComment);
+//                         newPost.save();
+//                         console.log('created new comment')
+//                     });
+    
+//                 });
+            
+//             });
+//         });
+//     });
+    
+// }
 
 module.exports = seedDB;
