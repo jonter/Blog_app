@@ -55,7 +55,7 @@ router.get('/:id', (req, res) => {
 	});
 });
 //EDIT ROUTE
-router.get('/:id/edit', middleware.checkPostOwnership, (req, res) => {
+router.get('/:id/edit', middleware.isLoggedIn , middleware.checkPostOwnership, (req, res) => {
 	Post.findById(req.params.id, (err, foundPost) => {
 		if (err) {
 			console.log(err);
@@ -67,7 +67,7 @@ router.get('/:id/edit', middleware.checkPostOwnership, (req, res) => {
 });
 
 //UPDATE ROUTE
-router.put('/:id', middleware.checkPostOwnership, (req, res) => {
+router.put('/:id', middleware.isLoggedIn ,middleware.checkPostOwnership, (req, res) => {
 	req.body.blog.body = req.sanitize(req.body.blog.body);
 	Post.findByIdAndUpdate(req.params.id, req.body.blog, (err, updatedPost) => {
 		if (err) {
@@ -80,7 +80,7 @@ router.put('/:id', middleware.checkPostOwnership, (req, res) => {
 });
 
 //DELETE ROUTE
-router.delete('/:id', middleware.checkPostOwnership, (req, res) => {
+router.delete('/:id', middleware.isLoggedIn , middleware.checkPostOwnership, (req, res) => {
 	Post.findByIdAndRemove(req.params.id, (err) => {
 		if (err) {
 			return res.redirect('/posts' + req.params.id);

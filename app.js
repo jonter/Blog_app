@@ -59,7 +59,6 @@ app.use(indexRoutes);
 app.use('/posts',postsRoutes);
 app.use('/posts/:id_post/comments',commentRoutes);
 
-
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, process.env.IP, () => {
 	console.log('Server has started');

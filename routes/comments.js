@@ -46,7 +46,7 @@ router.post('/', middleware.isLoggedIn, (req,res)=>{
 });
 
 //EDIT ROUTE
-router.get('/:id_comment/edit', middleware.checkCommentOwnership, (req, res)=>{
+router.get('/:id_comment/edit', middleware.isLoggedIn , middleware.checkCommentOwnership, (req, res)=>{
 	Post.findById(req.params.id_post, (err,foundPost)=>{
 		if(err || !foundPost){
 			req.flash('error', 'Cannot find the post');
@@ -63,7 +63,7 @@ router.get('/:id_comment/edit', middleware.checkCommentOwnership, (req, res)=>{
 });
 
 //UPDATE ROUTE
-router.put('/:id_comment', middleware.checkCommentOwnership, (req,res)=>{
+router.put('/:id_comment', middleware.isLoggedIn , middleware.checkCommentOwnership, (req,res)=>{
 	Comment.findByIdAndUpdate(req.params.id_comment, req.body.comment , (err, updatedComment)=>{
 		if(err || !updatedComment){
 			req.flash('error','Cannot update the comment');
@@ -75,7 +75,7 @@ router.put('/:id_comment', middleware.checkCommentOwnership, (req,res)=>{
 });
 
 //DESTROY ROUTE
-router.delete('/:id_comment', middleware.checkCommentOwnership,(req,res)=>{
+router.delete('/:id_comment', middleware.isLoggedIn , middleware.checkCommentOwnership,(req,res)=>{
 	Comment.findByIdAndRemove(req.params.id_comment, (err)=>{
 		if(err){
 			console.log(err);
