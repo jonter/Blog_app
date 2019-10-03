@@ -57,7 +57,7 @@ router.post('/register', (req,res)=>{
 					html: output
 				}, (err, info)=>{
 					if(err){
-						req.flash(err);
+						req.flash('error', err.message);
 						return res.redirect('back')
 					}
 					req.flash('success', `Please, confirm your accont with your email. The letter sent to ${user.email}`);
@@ -74,7 +74,7 @@ router.post('/register', (req,res)=>{
 
 router.get('/confirmation/:token', (req, res)=>{
 	Token.findOne({token:req.params.token}, (err, foundToken)=>{
-		if(err){
+		if(err || !foundToken){
 			req.flash('error', 'We were unable to find a valid token. Your token my have expired.');
 			return res.redirect('/posts');
 		}
@@ -105,16 +105,10 @@ router.get('/login', (req, res)=>{
 
 router.post('/login', passport.authenticate('local',{
 	successRedirect:'/posts',
-	failureRedirect:'/login' 
-}) ,(req, res)=>{
-	User.findById(req.user._id, (err, foundUser)=>{
-		if(err || !foundUser){
-			req.flash('error', 'Wrong password or username');
-			res.redirect('/login');
-		}
-		//...
-
-	});
+	failureRedirect:'/login',
+	failureFlash: 'Invalid username or password.',
+	successFlash: 'Welcome back!'
+}) , (req, res)=>{
 });
 
 //LOGOUT route

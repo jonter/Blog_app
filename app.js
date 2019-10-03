@@ -39,7 +39,7 @@ app.use(require('express-session')({
 
 app.use(passport.initialize());
 app.use(passport.session());
-passport.use(new LocalStrategy(User.authenticate()));
+passport.use(new LocalStrategy({usernameField: 'email', passwordField: 'password'}, User.authenticate()));
 
 //add an anonymus middleware before each route which add a new var (currentUser) to ejs files
 app.use((req, res, next)=>{
