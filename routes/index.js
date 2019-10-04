@@ -6,6 +6,8 @@ const passport = require('passport');
 const crypto = require('crypto');// helps us to generate random hashed strings (internal node module)
 const nodemailer = require('nodemailer');
 
+const { check, validationResult } = require('express-validator');
+
 //ROOT ROUTE
 router.get('/', (req, res) => {
 	res.render('landing');
@@ -17,7 +19,15 @@ router.get('/register', (req,res)=>{
 	res.render('register');
 });
 
-router.post('/register', (req,res)=>{
+router.post('/register',  [
+		check('email').isEmail().withMessage('put your real emil').isLength({max: 40}),
+		check('password').isLength({ min: 10, max:30 }).withMessage('must be at least 10 chars long')
+	], (req,res)=>{
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		req.flash('error', `${errors.errors[0].param} : ${errors.errors[0].msg}`);
+		return res.redirect('back');
+	}
 	const newUser = new User({username: req.body.username, email: req.body.email});
 	//handle error with the registered user
 	User.register(newUser, req.body.password, (err,user)=>{
@@ -109,6 +119,7 @@ router.post('/login', passport.authenticate('local',{
 	failureFlash: 'Invalid username or password.',
 	successFlash: 'Welcome back!'
 }) , (req, res)=>{
+	
 });
 
 //LOGOUT route

@@ -1,8 +1,9 @@
 <% include ./partials/header %>
 <h1>Login route</h1>
 <form action="/login" method="POST">
-    <input type="email" name = "email" placeholder="email" required>
-    <input type="password" name = "password" placeholder="password" required>
+    <input type="email" name = "email" placeholder="email" maxlength="40" required >
+    <input type="password" id="pass" name = "password" placeholder="password" required
+    maxlength="30" minlength="10" title="The password length should be between 10 and 30 chars">
     <button>Login!</button>
 </form>
 

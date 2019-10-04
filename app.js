@@ -32,7 +32,7 @@ app.use(flash());
 
 //PASSPORT CONFIGS
 app.use(require('express-session')({
-	secret: 'I will change that secret later',
+	secret: process.env.PASSPORT_SECRET,
 	resave:false,
 	saveUninitialized: false
 }));
