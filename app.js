@@ -1,7 +1,7 @@
 const express 				= require('express'),
 	bodyParser 				= require('body-parser'),
 	mongoose 				= require('mongoose'),
-	flash 					= require('connect-flash'),
+	flash 				= require('connect-flash'),
 	passport 				= require('passport'),
 	LocalStrategy			= require('passport-local'),
 	methodOverride 			= require('method-override'), // allows us to use ?_method overriding
@@ -15,10 +15,7 @@ const indexRoutes = require('./routes/index'),
 	  postsRoutes = require('./routes/posts');
 
 //let us use env variables defined in .env file (dotenv package)
-if(process.env.IS_PRODUCTION == undefined){
-	console.log('kek');
-	require('dotenv').config();
-}
+require('dotenv').config();
 
 //set up DB and express
 const url = process.env.DATABASE_URL || 'mongodb://localhost:27017/blog_app';
