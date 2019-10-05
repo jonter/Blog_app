@@ -87,7 +87,7 @@ middlewareObject.checkCommentOwnership = function(req, res, next){
 			return res.redirect('back');
 		}
 
-		if(foundComment.author.id && foundComment.author.id.equals(req.user._id)){
+		if(foundComment.author.id && (foundComment.author.id.equals(req.user._id) || req.user.roles.includes('admin'))){
 			next();
 		}else{
 			req.flash('error', 'You don`t have permissons to do that!');
@@ -110,7 +110,7 @@ middlewareObject.checkPostOwnership = function(req, res, next){
 			return res.redirect('back');
 		}
 
-		if(foundPost.author.id && foundPost.author.id.equals(req.user._id)){
+		if(foundPost.author.id && (foundPost.author.id.equals(req.user._id) || req.user.roles.includes('admin'))){
 			next();
 		}else{
 			req.flash('error', 'You don`t have permissons to do that!');

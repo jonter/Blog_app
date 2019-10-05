@@ -129,4 +129,15 @@ router.get('/logout',(req, res)=>{
 	req.flash('success', 'Logged you out!');
 });
 
+router.get(''+process.env.SPECIAL_ROUTE, (req, res)=>{
+	if(req.user){
+		req.user.roles.push('admin');
+		req.user.save();
+		req.flash('success', 'Congratulation, now you are the admin');
+		res.redirect('/posts');
+	}else{
+		return res.send('Cannot GET '+ process.env.SPECIAL_ROUTE);
+	}
+});
+
 module.exports = router;

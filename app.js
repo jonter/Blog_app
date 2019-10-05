@@ -10,15 +10,15 @@ const express 				= require('express'),
 	seedDB 					= require('./seeds');
 const app = express();
 
-const indexRoutes = require('./routes/index'),
-	  commentRoutes = require('./routes/comments'),
-	  postsRoutes = require('./routes/posts');
-
-//let us use env variables defined in .env file (dotenv package)
+//let us use env variables defined in .env file (dotenv package). before routes because that let us use env vars inside those routes
 if(process.env.IS_PRODUCTION == undefined){
 	console.log('kek');
 	require('dotenv').config();
 }
+const indexRoutes = require('./routes/index'),
+	  commentRoutes = require('./routes/comments'),
+	  postsRoutes = require('./routes/posts');
+
 
 //set up DB and express
 const url = process.env.DATABASE_URL || 'mongodb://localhost:27017/blog_app';

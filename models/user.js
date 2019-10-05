@@ -6,6 +6,7 @@ const userSchema = new mongoose.Schema({
     email: String,
     isVerified:{ type:Boolean, default: false },
     password: String,
+    roles: [{type: String}]
 });
 userSchema.plugin(passportLocalMongoose, {
     usernameField: 'email'// now authorization by email field
