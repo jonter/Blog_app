@@ -6,6 +6,8 @@ const userSchema = new mongoose.Schema({
     email: String,
     isVerified:{ type:Boolean, default: false },
     password: String,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
     roles: [{type: String}]
 });
 userSchema.plugin(passportLocalMongoose, {

@@ -1,0 +1,9 @@
+<% include ./partials/header %>
+<h1>Password resetting</h1>
+<h2> Enter your email to reset the password </h2>
+<form action="/reset" method="POST">
+    <input type="email" name = "email" placeholder="email" maxlength="40" required >
+    <button>Reset password!</button>
+</form>
+
+<% include ./partials/footer %>

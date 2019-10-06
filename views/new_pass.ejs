@@ -1,0 +1,12 @@
+<% include ./partials/header %>
+<h1>Password resetting</h1>
+<h2> Set your new password </h2>
+<form action="/reset/<%= token %>" method="POST">
+    <input type="password" id="pass" name = "password" placeholder="password" required
+    maxlength="30" minlength="10" title="The password length should be between 10 and 30 chars">
+    <input type="password" id="pass" name = "confirm" placeholder="confirm password" required
+    maxlength="30" minlength="10">
+    <button>Set new password</button>
+</form>
+
+<% include ./partials/footer %>

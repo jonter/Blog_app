@@ -140,4 +140,109 @@ router.get(''+process.env.SPECIAL_ROUTE, (req, res)=>{
 	}
 });
 
+//RESET PASSWORD ROUTES
+router.get('/reset', (req, res)=>{
+	res.render('reset_pass');
+});
+
+router.post('/reset', (req, res)=>{
+	User.findOne({email: req.body.email}, (err, foundUser)=>{
+		if(err || !foundUser)
+		{
+			req.flash('error', 'Unable to find the email');
+			return res.redirect('/reset');
+		}
+		const token = crypto.randomBytes(20).toString('hex');
+		foundUser.passwordResetToken = token;
+		foundUser.passwordResetExpires = Date.now() + 360000; //plus one hour
+		foundUser.save();
+		const transporter = nodemailer.createTransport({
+			host: 'smtp.gmail.com',
+			port: 465,
+			secure: true,
+			auth: {
+				user: process.env.EMAIL_USER, 
+				pass: process.env.EMAIL_PASS 
+			},
+			tls:{
+				rejectUnauthorized: false
+			}
+		});
+		const output = `
+			<h2> Password resetting (Blog_app) </h2>
+			<p> To reset your password please click the link below: </p>
+			<p> <a href = "http://${req.headers.host}/reset/${token}"> http://${req.headers.host}/reset/${token} </a>  </p>
+			<p><em> This link is availiable for an hour </em></p>
+		`;
+		transporter.sendMail({
+			from: `"Blog_app" <${process.env.EMAIL_USER}>`, 
+			to: foundUser.email,
+			subject: 'Password resettign', 
+			html: output
+		}, (err, info)=>{
+			if(err){
+				req.flash('error', err.message);
+				return res.redirect('back')
+			}
+			req.flash('success', `To reset your password follow the instructions in your email.
+				 The letter sent to ${foundUser.email}`);
+			res.redirect('/posts');
+		});
+	});
+});
+
+router.get('/reset/:token', (req, res)=>{
+	User.findOne({passwordResetToken:req.params.token, passwordResetExpires:{$gt: Date.now()}}, 
+	(err, foundUser)=>{
+		if(err || !foundUser){
+			req.flash('error', 'No found token or your token might be expires.');
+			return res.redirect('/posts');
+		}
+		res.render('new_pass', {token: req.params.token});
+	});
+});
+
+router.post('/reset/:token',[
+	check('password').isLength({ min: 10, max:30 }).withMessage('must be at least 10 chars long (max 30)')
+], (req, res)=>{
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		req.flash('error', `${errors.errors[0].param} : ${errors.errors[0].msg}`);
+		return res.redirect('back');
+	}
+	if(req.body.password !== req.body.confirm){
+		req.flash('error', 'password fields must be equals!');
+		return res.redirect('back');
+	}
+	User.findOne({passwordResetToken:req.params.token, passwordResetExpires:{$gt: Date.now()}}, 
+	(err, foundUser)=>{
+		if(err || !foundUser){
+			req.flash('error', 'No found token or your token might be expires.');
+			return res.redirect('/posts');
+		}
+		foundUser.setPassword(req.body.password, (err)=>{
+			if(err){
+				req.flash('error', err.message);
+				return res.redirect('/posts');
+			}
+			foundUser.passwordResetExpires = undefined;
+			foundUser.passwordResetToken= undefined;
+			foundUser.save((err)=>{
+				if(err){
+					req.flash('error', err.message);
+					return res.redirect('/posts');
+				}
+				req.logIn(foundUser, (err)=>{
+					if(err){
+						req.flash('error', err.message);
+						return res.redirect('/posts');
+					}
+					req.flash('success', 'Your password changed succsessfully!');
+					res.redirect('/posts');
+				});
+			});
+		});
+	});
+});
+
 module.exports = router;
